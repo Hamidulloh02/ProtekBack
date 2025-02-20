@@ -33,6 +33,7 @@ ALLOWED_HOSTS = ['protek.com.uz','proback.protek.com.uz','*']
 
 INSTALLED_APPS = [
     'jazzmin',
+    "modeltranslation",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -73,6 +74,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+LANGUAGE_CODE = 'uz' 
+
+MODELTRANSLATION_LANGUAGES = ('uz', 'ru')
 # SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # SESSION_COOKIE_SECURE = True
 # CSRF_COOKIE_SECURE = True

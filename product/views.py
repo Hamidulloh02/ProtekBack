@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.generics import ListAPIView,RetrieveAPIView,CreateAPIView,RetrieveUpdateDestroyAPIView,RetrieveUpdateAPIView
 from .models import Product,Description,Category,Productclass,Brand,Topproduct,OnlyOneProduct
-from .serializers import productSerializers,descriptionSerializers,CategorySerializer,ClassSerializers,BrandSerializers,TopproductSerializers,OnlyOneProSerializers
+from .serializers import ProductSerializer,descriptionSerializers,CategorySerializer,ClassSerializers,BrandSerializers,TopproductSerializers,OnlyOneProSerializers,ProductSerializer
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
 from rest_framework.response import Response
@@ -16,11 +16,28 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 
 # Create your views here.
+
 class ProductListView(ListAPIView):
     queryset = Product.objects.all().order_by('-id')
-    serializer_class = productSerializers
+    serializer_class = ProductSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
-    search_fields = ['category__name','category__id','brand__name','productclass__name','title']
+    search_fields = ['category__name', 'category__id', 'brand__name', 'productclass__name']
+
+    def get_queryset(self):
+        """
+        Foydalanuvchi so‘ragan til bo‘yicha `title` ni filtrlaydi.
+        """
+        queryset = super().get_queryset()
+        request = self.request
+        lang = request.GET.get('lang', 'en')  # Standart til English
+        
+        search_title = request.GET.get('search', None)
+        if search_title:
+            title_field = f'title_{lang}'
+            filter_kwargs = {f"{title_field}__icontains": search_title}
+            queryset = queryset.filter(**filter_kwargs)
+
+        return queryset
 
     # def get_search_fields(self, request):
     #     search_param = request.GET.get('search', '')
@@ -37,7 +54,7 @@ class ProductListView(ListAPIView):
 
 class SingleProductListView(RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
-    serializer_class = productSerializers
+    serializer_class = ProductSerializer
 
 class LargeResultsSetPagination(PageNumberPagination):
     page_size = 9
@@ -45,7 +62,7 @@ class LargeResultsSetPagination(PageNumberPagination):
     max_page_size = 9
 class ProductPagination(ListAPIView):
     queryset = Product.objects.all().order_by('-id')
-    serializer_class = productSerializers
+    serializer_class = ProductSerializer
     pagination_class = LargeResultsSetPagination
     filter_backends = (DjangoFilterBackend,SearchFilter)
     search_fields = ['category__name','category__id','brand__name','productclass__name']

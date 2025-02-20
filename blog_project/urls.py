@@ -23,6 +23,7 @@ from drf_yasg import openapi
 from .yasg import urlpatterns as doc_urls
 from django.urls import path, include, re_path
 
+
 schema_view = get_schema_view(
     openapi.Info(
         title='Blog Api',

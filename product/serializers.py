@@ -24,14 +24,37 @@ class TopproductSerializers(serializers.ModelSerializer):
         model = Topproduct
         fields = ('id','img','created_at','updated_at')
 
-class productSerializers(serializers.ModelSerializer):
+class ProductSerializer(serializers.ModelSerializer):
     category = CategorySerializer()
     productclass = ClassSerializers()
     description = descriptionSerializers(many=True)
     brand = BrandSerializers()
+    
+    title = serializers.SerializerMethodField()
+    info = serializers.SerializerMethodField()
+    descript_text = serializers.SerializerMethodField()
+
     class Meta:
         model = Product
-        fields = ('id','title','img','info','category','productclass','descript_text','description','brand')
+        fields = ('id', 'title', 'img', 'info', 'category', 'productclass', 'descript_text', 'description', 'brand')
+
+    def get_title(self, obj):
+        request = self.context.get('request', None)
+        lang = request.GET.get('lang', 'en') if request else 'en'
+        return getattr(obj, f'title_{lang}', obj.title)
+
+    def get_info(self, obj):
+        request = self.context.get('request', None)
+        lang = request.GET.get('lang', 'en') if request else 'en'
+        return getattr(obj, f'info_{lang}', obj.info)
+
+    def get_descript_text(self, obj):
+        request = self.context.get('request', None)
+        lang = request.GET.get('lang', 'en') if request else 'en'
+        return getattr(obj, f'descript_text_{lang}', obj.descript_text)
+
+
+    
 class OnlyOneProSerializers(serializers.ModelSerializer):
     productclass = ClassSerializers()
     class Meta:
