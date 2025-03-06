@@ -17,6 +17,7 @@ class TechnicalSpecifications(admin.ModelAdmin):
 class ProductAdmin(admin.ModelAdmin):  # `TechnicalSpecifications, TranslationAdmin` kerak bo‘lsa, qo‘shing
     list_display = ('image_tag', 'title')  # ✅ Rasmni chiqarish uchun `image_tag` qo‘shildi
     languages = ('uz', 'ru')
+    inlines = [DescriptionInline]
 
     def image_tag(self, obj):  # ✅ `Product` emas, `obj` bo‘lishi kerak
         if obj.img:  # Rasm borligini tekshiramiz

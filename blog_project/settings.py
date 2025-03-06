@@ -63,7 +63,8 @@ SWAGGER_SETTINGS = {
     "SECURITY_DEFINITIONS": {"basic": {"type": "basic"}},
     "USE_SESSION_AUTH": True,
 }
-
+CSRF_TRUSTED_ORIGINS = ["http://localhost:3000"]
+CSRF_COOKIE_SECURE = False
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.generics import ListAPIView,RetrieveAPIView,CreateAPIView,RetrieveUpdateDestroyAPIView,RetrieveUpdateAPIView
 from .models import Product,Description,Category,Productclass,Brand,Topproduct,OnlyOneProduct
-from .serializers import ProductSerializer,descriptionSerializers,CategorySerializer,ClassSerializers,BrandSerializers,TopproductSerializers,OnlyOneProSerializers,ProductSerializer
+from .serializers import ProductSerializer,descriptionSerializers,CategorySerializer,ClassSerializer,BrandSerializers,TopproductSerializers,OnlyOneProSerializers,ProductSerializer
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
 from rest_framework.response import Response
@@ -38,6 +38,27 @@ class ProductListView(ListAPIView):
             queryset = queryset.filter(**filter_kwargs)
 
         return queryset
+class ClassListApiView(ListAPIView):
+    queryset = Productclass.objects.all().order_by('id')
+    serializer_class = ClassSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    search_fields = ['name']
+
+    def get_queryset(self):
+        """
+        Foydalanuvchi so‘ragan til bo‘yicha `name` ni filtrlaydi.
+        """
+        queryset = super().get_queryset()
+        request = self.request
+        lang = request.GET.get('lang', 'en')  # Standart til English
+        
+        search_name = request.GET.get('search', None)
+        if search_name:
+            name_field = f'name_{lang}'
+            filter_kwargs = {f"{name_field}__icontains": search_name}
+            queryset = queryset.filter(**filter_kwargs)
+
+        return queryset
 
     # def get_search_fields(self, request):
     #     search_param = request.GET.get('search', '')
@@ -65,7 +86,7 @@ class ProductPagination(ListAPIView):
     serializer_class = ProductSerializer
     pagination_class = LargeResultsSetPagination
     filter_backends = (DjangoFilterBackend,SearchFilter)
-    search_fields = ['category__name','category__id','brand__name','productclass__name']
+    search_fields = ['category__name','category__id','brand__name','productclass__name_uz','productclass__name_ru','productclass__name']
 
 
 class CategoryListView(ListAPIView):
@@ -74,7 +95,7 @@ class CategoryListView(ListAPIView):
 
 class ClassListApiView(ListAPIView):
     queryset = Productclass.objects.all().order_by('id')
-    serializer_class = ClassSerializers
+    serializer_class = ClassSerializer
 
 class BrandListapiview(ListAPIView):
     queryset = Brand.objects.all().order_by('id')
